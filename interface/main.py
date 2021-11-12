@@ -25,7 +25,6 @@ class Screen(QMainWindow):
         timer1 = QTimer(self, interval=1000, timeout=self.showTime)
         timer1.start()
         self.showTime()
-        # grid = QGridLayout()     
         self.widget.setLayout(self.ui)
         self.setWindowTitle('Postulante para ROBOTILSA S.A')
         self.resize(800,600)
@@ -40,22 +39,19 @@ class Screen(QMainWindow):
         self.date_actual = QLabel(date_now.strftime('%d/%m/%Y'))
         self.date_actual.setAlignment(Qt.AlignCenter)
         self.date_actual.setFont(QFont ("Times",30,weight=QFont.Bold))
-        # self.date_actual.tex
-        # self.date_actual.setStyleSheet("color:#143642")
 
         self.hour_actual = QLabel(date_now.strftime('%H:%M:%S'))
         self.hour_actual.setAlignment(Qt.AlignCenter)
-        # self.hour_actual.setStyleSheet("background-color:#F1F7EE")
-        # self.hour_actual.setAlignment(Qt.AlignHCenter)
         self.hour_actual.setFont(QFont("Times",35,weight=QFont.Bold))
         self.connect_button = QPushButton('REQUEST')
+        self.connect_button.setIcon(QIcon("assets/icons8-url-64.png"))
+        self.connect_button.setStyleSheet("font-family:Times New Roman;")
+        self.connect_button.setFixedSize(300,70)
         self.connect_button.clicked.connect(self.onConnect)
 
 
         self.tableWidget = QListWidget()
         self.tableWidget.installEventFilter(self)
-        # self.tableWidget.setColumnCount(1)
-        # self.tableWidget.verticalHeader().setVisible(True)
 
         grid = QGridLayout()
         grid.addWidget(self.tableWidget, 0, 0,3,1)
@@ -65,8 +61,8 @@ class Screen(QMainWindow):
         grid.setRowStretch(0,1)
         grid.setRowStretch(1,1)
         grid.setRowStretch(2,2)
-        grid.setColumnStretch(1,3)        
-
+        grid.setColumnStretch(0,1)        
+        grid.setColumnStretch(1,1)        
         return grid
     #---------------------- FUNCTIONS -------------------------------------------------
     def showDialog(self, text):
@@ -106,16 +102,36 @@ class Screen(QMainWindow):
            source is self.tableWidget):
             menu = QMenu()
             menu.addAction('Información del personaje')
-            # print("Hello")
             if menu.exec_(event.globalPos()):
                 item = source.itemAt(event.pos())
                 print(item.text())
                 self.dialog =QDialog()
-                self.dialog.setWindowTitle("Soy un popup")
-                self.dialog.setFixedSize(200, 100)
+                self.dialog.setWindowTitle("Ventana secundaria")
+                self.dialog.setFixedSize(200, 500)
+                self.box = self.dialog_table(item)
+                self.dialog.setLayout(self.box)
+                self.dialog_table(item)
                 self.dialog.show()
             return True
         return super(Screen, self).eventFilter(source, event)
+
+    def dialog_table(self, data):
+        data = ['height', 'mass','hair_color','skin_color','eye_color','birth_year','gender']
+        layout = QVBoxLayout()
+        information = self.search(data)
+        for x in data:
+            layout1 = QHBoxLayout()
+            label = QLabel(x)
+            label.setFont(QFont("Times",12,weight=QFont.Bold))
+            layout1.addWidget(label)
+            layout1.addStretch(1)
+            layout1.addWidget(QLabel(information[x]))
+            layout.addLayout(layout1)
+        return layout
+
+    def search(self, name):
+        for x in self.names:
+            return x
 
     @pyqtSlot()
     def showTime(self):
@@ -126,38 +142,14 @@ class Screen(QMainWindow):
         self.hour_actual.setText(hour)
         self.date_actual.setText(date)
 
-    # def closeEvent(self, event):
-
-    #     quit_msg = "Are you sure you want to exit the program?"
-    #     reply = QMessageBox.question(self, 'Message', 
-    #                     quit_msg, QMessageBox.Yes, QMessageBox.No)
-
-    #     if reply == QMessageBox.Yes:
-    #         global stop_threads, flag_save
-    #         # self.Serial.record_on_exit()
-    #         stop_threads = True 
-    #         flag_save = False
-    #         event.accept()
-    #     else:
-    #         event.ignore()
-
-# class Dialog(QDialog):
-#     def __init__(self, *args, **kwargs):
-#         super(Dialog, self).__init__(*args, **kwargs)
-#         self.setWindowTitle("Soy un popup")
-#         print(frame.names)
-#         self.setFixedSize(200, 100)
 
 
 def main():
     global stop_threads, frame
-    # signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = QApplication(sys.argv)
     frame = Screen()
     frame.show()
-    # app.exec_() 
-    # stop_threads = True 
-    # flag_save = False
+
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
